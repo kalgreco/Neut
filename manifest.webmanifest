@@ -1,0 +1,17 @@
+{
+  "name": "The Longest Day of Neutro",
+  "short_name": "Neutro",
+  "description": "Play as a white blood cell and defend Milo's body from bacteria, viruses, and parasites.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["fullscreen", "standalone"],
+  "orientation": "any",
+  "background_color": "#c8385e",
+  "theme_color": "#3a0d1f",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
