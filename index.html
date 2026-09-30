@@ -201,16 +201,25 @@ h3{font-size:17px;margin:16px 0 6px;font-weight:700}
 .vol{display:flex;align-items:center;gap:10px}
 .vol input{width:150px;accent-color:var(--plasma-deep);touch-action:manipulation}
 .vol b{min-width:42px;text-align:right;font-size:14px;color:var(--ink)}
-#hud{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:2;display:grid;grid-template-columns:1fr 1fr auto 1fr 1fr auto;gap:6px 14px;align-items:center;padding:6px 14px calc(8px + env(safe-area-inset-bottom,0px));background:var(--ink);pointer-events:none;border-top:1px solid rgba(255,255,255,.08)}
-#hud .m{min-width:0}
-#hud .lbl{font-size:12px;font-weight:600;gap:6px;white-space:nowrap}
-#hud .bar{height:8px;margin-top:3px}
-#hud .pts{font-size:20px;text-align:center;line-height:1;min-width:44px}
-#hud .pts small{font-size:10px;margin-top:2px}
-#hud .pausebtn{pointer-events:auto;width:40px;height:36px;font-size:14px;background:rgba(255,255,255,.14);backdrop-filter:none;align-self:center}
-@media (max-width:640px){ #hud{grid-template-columns:1fr 1fr auto;padding:4px 12px calc(6px + env(safe-area-inset-bottom,0px));gap:4px 12px} #hud .kills{display:none} #hud .pausebtn{width:44px;height:30px;justify-self:center} }
-@media (orientation: landscape) and (max-height:520px){ #hud{padding:4px 10px calc(4px + env(safe-area-inset-bottom,0px))} #hud .pts small{display:none} }
-@media not all and (orientation: landscape) and (max-height:520px){ .backups{padding-bottom:6px;z-index:2} }
+#hud{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:2;display:flex;align-items:center;gap:10px;padding:8px 12px 4px;background:var(--ink);pointer-events:none}
+#hud .xpline{position:absolute;left:0;right:0;top:0;height:3px;background:#1d0710}
+#hud .xpline i{display:block;height:100%;background:linear-gradient(90deg,#5fd3f3,#8be38b);transition:width .15s}
+#hud .lv{font-size:12px;font-weight:700;color:#8be38b;flex:0 0 auto;white-space:nowrap}
+#hud .mini{display:flex;align-items:center;gap:5px;flex:1 1 0;min-width:0}
+#hud .hi{width:15px;height:15px;flex:0 0 auto}
+#hud .bar{flex:1 1 auto;height:8px;margin:0}
+#hud .pts{font-size:17px;font-weight:700;color:var(--gold);line-height:1;flex:0 0 auto;text-align:right;min-width:0}
+#hud .pausebtn{pointer-events:auto;flex:0 0 auto;width:34px;height:30px;border-radius:10px;font-size:12px;background:rgba(255,255,255,.14);backdrop-filter:none}
+.sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* one row of backups with the ability button at the end; switch cell is a badge on the ability button */
+.backups .abil{position:relative;flex:0 0 auto;display:flex;margin-left:4px}
+.backups .abil .dashbtn::before{content:"";position:absolute;inset:-6px;border-radius:50%;z-index:-1;background:conic-gradient(#ff9ecd var(--al,0%),rgba(255,255,255,.1) 0);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px));mask:radial-gradient(farthest-side,transparent calc(100% - 4px),#000 calc(100% - 3px))}
+.backups .abil .switchbtn{position:absolute;left:-10px;top:-10px;width:28px;height:28px;border-radius:50%;font-size:13px;padding:0;box-shadow:0 2px 0 #c96a9a;z-index:1}
+.backups .abil .switchbtn.ready{display:flex;align-items:center;justify-content:center}
+@media not all and (orientation: landscape) and (max-height:520px){ .backups{flex-wrap:nowrap;align-items:center;gap:5px} }
+@media (max-width:640px){ .backups .bk{flex:1 1 0;width:auto;max-width:46px;height:48px} .backups .dashbtn{width:52px;height:52px;font-size:22px} }
+@media (orientation: landscape) and (max-height:520px){ #hud{padding:7px 10px calc(4px + env(safe-area-inset-bottom,0px))} }
+@media not all and (orientation: landscape) and (max-height:520px){ .backups{padding-top:6px;padding-bottom:calc(6px + env(safe-area-inset-bottom,0px));z-index:2;box-shadow:none} }
 @media (orientation: landscape) and (max-height:520px){ .backups{padding-bottom:8px} }
 </style>
 </head>
@@ -219,12 +228,13 @@ h3{font-size:17px;margin:16px 0 6px;font-weight:700}
 <div class="vig" id="vig"></div>
 
 <div class="hud" id="hud">
-  <div class="m"><div class="lbl"><span>Body</span><span id="bodyTxt">100%</span></div><div class="bar body"><i id="bodyBar" style="width:100%"></i></div></div>
-  <div class="m"><div class="lbl"><span>Neutro</span><span id="hpTxt">100</span></div><div class="bar hp"><i id="hpBar" style="width:100%"></i></div></div>
-  <div class="pts"><span id="ptsTxt">0</span><small>points</small></div>
-  <div class="m"><div class="lbl"><span>Level <span id="lvlTxt">1</span></span><span id="killTxt" class="kills">0 zapped</span></div><div class="bar xp"><i id="xpBar" style="width:0%"></i></div></div>
-  <div class="m"><div class="lbl"><span>Alarm</span><span id="alarmTxt">0%</span></div><div class="bar alarm"><i id="alarmBar" style="width:0%"></i></div></div>
+  <div class="xpline" aria-hidden="true"><i id="xpBar" style="width:0%"></i></div>
+  <span class="lv">Lv <span id="lvlTxt">1</span></span>
+  <div class="mini" title="Body"><svg class="hi" viewBox="0 0 24 24" aria-hidden="true"><path d="M19 14c1.5-1.5 3-3.2 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.8 0-3 .5-4.5 2-1.5-1.5-2.7-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4 3 5.5l7 7Z" fill="none" stroke="#ff8fa3" stroke-width="2.4" stroke-linejoin="round"></path></svg><div class="bar body"><i id="bodyBar" style="width:100%"></i></div><span class="sr">Body <span id="bodyTxt">100%</span></span></div>
+  <div class="mini" title="Neutro"><svg class="hi" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c4 0 8 3 8 8s-3 9-8 9-8-3-8-8 4-9 8-9z" fill="none" stroke="#fff6e9" stroke-width="2.4" stroke-linejoin="round"></path><path d="M9.5 10v.5M14.5 10v.5" stroke="#fff6e9" stroke-width="2.4" stroke-linecap="round"></path></svg><div class="bar hp"><i id="hpBar" style="width:100%"></i></div><span class="sr">Neutro <span id="hpTxt">100</span></span></div>
+  <span class="pts" id="ptsTxt">0</span>
   <button class="pausebtn" id="pauseBtn" aria-label="Pause">II</button>
+  <div class="sr"><span id="killTxt">0 zapped</span><span id="alarmTxt">0%</span><i id="alarmBar"></i></div>
 </div>
 
 <div class="backups" id="backups"></div>
@@ -406,7 +416,7 @@ const TISSUE = 78, WALL = 22; let FLOOR = 0, RIGHT = 0, LEFT = 0, rail=false;
 const RAIL_MQ=matchMedia('(orientation: landscape) and (max-height: 520px)');
 function measureDock(){ const bk=document.getElementById('backups'), hud=document.getElementById('hud'); rail=RAIL_MQ.matches;
   if(rail){ bk.style.bottom=''; const r=bk.getBoundingClientRect(); const onRight=r.left>W*.5; if(onRight){ RIGHT=r.left-4; LEFT=0; } else { LEFT=r.right+4; RIGHT=W; } hud.style.left=(onRight?0:r.right)+'px'; hud.style.right=(onRight?W-r.left:0)+'px'; hud.style.bottom='0px'; const hr=hud.getBoundingClientRect(); FLOOR=Math.max(H*.5,(hr.height?hr.top:H)-8); }
-  else { hud.style.left='0px'; hud.style.right='0px'; hud.style.bottom='0px'; const hh=hud.getBoundingClientRect().height||0; bk.style.bottom=hh+'px'; const r=bk.getBoundingClientRect(); RIGHT=W; LEFT=0; FLOOR=Math.max(H*.5,(r.height?r.top:H-hh)-8); } }
+  else { bk.style.bottom='0px'; const bh=bk.getBoundingClientRect().height||0; hud.style.left='0px'; hud.style.right='0px'; hud.style.bottom=bh+'px'; const hr=hud.getBoundingClientRect(); RIGHT=W; LEFT=0; FLOOR=Math.max(H*.5,(hr.height?hr.top:H-bh)-6); } }
 const rnd = (a,b)=>a+Math.random()*(b-a);
 const clamp = (v,a,b)=>Math.max(a,Math.min(b,v));
 const dist = (a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
@@ -965,8 +975,8 @@ function buildBackups(){
     el.addEventListener('pointercancel',()=>{ clearTimeout(pressT); hideTip(); });
     el.addEventListener('keydown',e=>{ if(e.key==='Enter'||e.key===' '){ e.preventDefault(); useBackup(b); } });
     box.appendChild(el); });
-  const sw=document.createElement('button'); sw.className='switchbtn'; sw.id='switchBtn'; sw.textContent='🔄'; sw.setAttribute('aria-label','Switch cell'); sw.title='Switch cell'; sw.onclick=openSwitch; box.appendChild(sw);
-  const d=document.createElement('button'); d.className='dashbtn'; d.innerHTML='<i class="ring"></i><span aria-hidden="true">⚡</span>'; d.setAttribute('aria-label','Ability'); d.onpointerdown=ev=>{ev.preventDefault();dash();}; d.onkeydown=ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); dash(); } }; box.appendChild(d);
+  const sw=document.createElement('button'); sw.className='switchbtn'; sw.id='switchBtn'; sw.textContent='🔄'; sw.setAttribute('aria-label','Switch cell'); sw.title='Switch cell'; sw.onclick=openSwitch;
+  const d=document.createElement('button'); d.className='dashbtn'; d.innerHTML='<i class="ring"></i><span aria-hidden="true">⚡</span>'; d.setAttribute('aria-label','Ability'); d.onpointerdown=ev=>{ev.preventDefault();dash();}; d.onkeydown=ev=>{ if(ev.key==='Enter'||ev.key===' '){ ev.preventDefault(); dash(); } }; const ab=document.createElement('div'); ab.className='abil'; ab.appendChild(d); ab.appendChild(sw); box.appendChild(ab);
   requestAnimationFrame(measureDock);
 }
 function bcost(b){ let c=b.cost; if(b.id==='eos'&&has('worms')) c-=10; if(perks&&perks.thrift) c*=.8; c*=1+Math.max(0,(waveN||0)-2)*.04; return Math.round(c); }
@@ -1133,7 +1143,7 @@ function updateHud(){
   $('hpBar').style.width=(player.hp/player.maxHp*100)+'%'; $('hpTxt').textContent=player.dead?'respawning':Math.round(player.hp);
   $('ptsTxt').textContent=points; $('lvlTxt').textContent=level; $('killTxt').textContent=kills+' zapped';
   $('xpBar').style.width=(level>=levelCap()?100:Math.min(100,xp/xpNext*100))+'%';
-  $('alarmBar').style.width=alarm+'%'; $('alarmTxt').textContent=alarm>=100?(isTouch?'full':'full: Tab to switch'):Math.round(alarm)+'%';
+  $('alarmBar').style.width=alarm+'%'; { const db=$('backups').querySelector('.dashbtn'); if(db) db.style.setProperty('--al',Math.round(alarm)+'%'); } $('alarmTxt').textContent=alarm>=100?(isTouch?'full':'full: Tab to switch'):Math.round(alarm)+'%';
   const sb=$('switchBtn'); if(sb) sb.classList.toggle('ready', alarm>=100&&!tut&&settings.unlocked.length>1);
   updateBackups();
 }
@@ -1506,7 +1516,7 @@ const ES_DATA = {
 };
 const ES_EXACT = {
   // HUD and start screen
-  'Body':'Cuerpo','points to spend':'puntos para gastar','points':'puntos','full':'llena','Level':'Nivel','Alarm':'Alarma','respawning':'regresando','full: Tab to switch':'llena: Tab para cambiar',
+  'Body':'Cuerpo','Lv':'Nv','points to spend':'puntos para gastar','points':'puntos','full':'llena','Level':'Nivel','Alarm':'Alarma','respawning':'regresando','full: Tab to switch':'llena: Tab para cambiar',
   'The Longest Day of Neutro':'El día más largo de Neutro',
   'You are a neutrophil: brave, hungry, and gone by dawn. Milo, age nine, needs you. Invaders drift toward the tissue at the bottom of the screen. Eat them first.':'Eres un neutrófilo: valiente, hambriento y desaparecido al amanecer. Milo, de nueve años, te necesita. Los invasores bajan hacia el tejido en la parte inferior de la pantalla. Cómetelos primero.',
   'Playing as':'Jugando como','Starting cell':'Célula inicial','The cell you begin each run as. Mid-run, fill the alarm meter to switch.':'La célula con la que empiezas cada partida. Durante la partida, llena la alarma para cambiar.','Switch player':'Cambiar de jugador','Resume saved run':'Continuar partida guardada','Mode':'Modo','Campaign':'Campaña','Free play':'Juego libre','Where in the body':'¿En qué parte del cuerpo?','Choose your cell':'Elige tu célula','Difficulty':'Dificultad','Easy':'Fácil','Hard':'Difícil',
